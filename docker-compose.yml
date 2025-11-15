@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   spark-master:
-    image: bitnamilegacy/spark:3.5.0
+    image: bitnami/spark:latest
     container_name: spark-master
     environment:
       - SPARK_MODE=master
@@ -15,7 +15,7 @@ services:
       - ./data:/data
 
   spark-worker:
-    image: bitnamilegacy/spark:3.5.0
+    image: bitnami/spark:latest
     container_name: spark-worker
     environment:
       - SPARK_MODE=worker

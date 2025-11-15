@@ -6,9 +6,9 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Load landing zone data (reuse schemas from Step 3)
-customer_landing = spark.read.json("/data/landing/customer/")
-accelerometer_landing = spark.read.json("/data/landing/accelerometer/")
-step_trainer_landing = spark.read.json("/data/landing/step_trainer/")
+customer_landing = spark.read.json("/home/glue_user/stedi-project/data/landing/customer/")
+accelerometer_landing = spark.read.json("/home/glue_user/stedi-project/data/landing/accelerometer/")
+step_trainer_landing = spark.read.json("/home/glue_user/stedi-project/data/landing/step_trainer/")
 
 # TRANSFORMATION 1: Customer Landing to Trusted
 # Filter for customers who agreed to share data for research

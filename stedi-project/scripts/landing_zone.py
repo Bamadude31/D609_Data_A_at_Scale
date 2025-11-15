@@ -35,19 +35,19 @@ step_trainer_schema = StructType([
 
 # Read JSON files into DataFrames
 customer_landing = spark.read.json(
-    "/data/landing/customer/",
+    "/home/glue_user/stedi-project/data/landing/customer/",
     schema=customer_schema,
     multiLine=False
 )
 
 accelerometer_landing = spark.read.json(
-    "/data/landing/accelerometer/",
+    "/home/glue_user/stedi-project/data/landing/accelerometer/",
     schema=accelerometer_schema,
     multiLine=False
 )
 
 step_trainer_landing = spark.read.json(
-    "/data/landing/step_trainer/",
+    "/home/glue_user/stedi-project/data/landing/step_trainer/",
     schema=step_trainer_schema,
     multiLine=False
 )
