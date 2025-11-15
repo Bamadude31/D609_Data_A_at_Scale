@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS customer_landing (
+CREATE EXTERNAL TABLE IF NOT EXISTS customer_trusted (
     customerName STRING,
     email STRING,
     phone STRING,
@@ -9,9 +9,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS customer_landing (
     shareWithResearchAsOfDate BIGINT,
     shareWithPublicAsOfDate BIGINT
 )
-ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = '1'
-)
-LOCATION 's3://your-bucket-name/customer/landing/'
+STORED AS PARQUET
+LOCATION 's3://your-bucket-name/customer/trusted/'
 TBLPROPERTIES ('has_encrypted_data'='false');
