@@ -15,10 +15,17 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
 # Load Step Trainer Landing data from Glue Data Catalog
-step_trainer_landing = glueContext.create_dynamic_frame.from_catalog(
-    database="stedi",
-    table_name="step_trainer_landing"
-).toDF()
+step_trainer_landing = glueContext.create_dynamic_frame.from_options(
+    format_options={"multiline": False},
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "paths": ["s3://stedi-lakehouse-william-aldridge/step_trainer/landing/"],
+        "recurse": True
+    },
+    transformation_ctx="step_trainer_landing"
+)
+step_trainer_landing = step_trainer_landing.toDF()
 
 # Load Customer Curated from Glue Data Catalog
 customer_curated = glueContext.create_dynamic_frame.from_catalog(
@@ -47,9 +54,13 @@ glueContext.write_dynamic_frame.from_options(
     frame=step_trainer_trusted_dyf,
     connection_type="s3",
     connection_options={
-        "path": "s3://stedi-lakehouse-william-aldridge/step_trainer/trusted/"
+        "path": "s3://stedi-lakehouse-william-aldridge/step_trainer/trusted/",
+        "partitionKeys": []
     },
-    format="parquet"
+    format="parquet",
+    additional_options={
+        "enableUpdateCatalog": True,  # ← THIS IS CRITICAL
+        "updateBehavior": "UPDATE_IN_DATABASE"
+    }
 )
-
 job.commit()

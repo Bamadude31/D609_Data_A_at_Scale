@@ -16,10 +16,17 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
 # Load customer landing data from Glue Data Catalog
-customer_landing = glueContext.create_dynamic_frame.from_catalog(
-    database="stedi",
-    table_name="customer_landing"
-).toDF()
+customer_landing = glueContext.create_dynamic_frame.from_options(
+    format_options={"multiline": False},
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "paths": ["s3://stedi-lakehouse-william-aldridge/customer/landing/"],
+        "recurse": True
+    },
+    transformation_ctx="customer_landing"
+)
+
 
 # CRITICAL PRIVACY FILTER: Only customers who consented
 customer_trusted = customer_landing.filter(
@@ -41,9 +48,14 @@ glueContext.write_dynamic_frame.from_options(
     frame=customer_trusted_dyf,
     connection_type="s3",
     connection_options={
-        "path": "s3://stedi-lakehouse-william-aldridge/customer/trusted/"
-    },
-    format="parquet"
+        "path": "s3://stedi-lakehouse-william-aldridge/customer/trusted/",
+        "partitionKeys": []
+        },
+    format="parquet",
+    additional_options={
+        "enableUpdateCatalog": True,  # ← THIS IS CRITICAL
+        "updateBehavior": "UPDATE_IN_DATABASE"
+    }
 )
 
 job.commit()

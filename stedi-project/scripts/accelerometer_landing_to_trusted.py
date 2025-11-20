@@ -21,10 +21,17 @@ customer_trusted = glueContext.create_dynamic_frame.from_catalog(
 ).toDF()
 
 # Load accelerometer landing from Data Catalog
-accelerometer_landing = glueContext.create_dynamic_frame.from_catalog(
-    database="stedi",
-    table_name="accelerometer_landing"
+accelerometer_landing = glueContext.create_dynamic_frame.from_options(
+    format_options={"multiline": False},
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "paths": ["s3://stedi-lakehouse-william-aldridge/accelerometer/landing/"],
+        "recurse": True
+    },
+    transformation_ctx="accelerometer_landing"
 ).toDF()
+
 
 # Only include accelerometer readings from customers who consented
 accelerometer_trusted = accelerometer_landing.join(
@@ -47,9 +54,14 @@ glueContext.write_dynamic_frame.from_options(
     frame=accelerometer_trusted_dyf,
     connection_type="s3",
     connection_options={
-        "path": "s3://stedi-lakehouse-william-aldridge/accelerometer/trusted/"
+        "path": "s3://stedi-lakehouse-william-aldridge/accelerometer/trusted/",
+        "partitionKeys": []
     },
-    format="parquet"
+    format="parquet",
+    additional_options={
+        "enableUpdateCatalog": True,  # ← THIS IS CRITICAL
+        "updateBehavior": "UPDATE_IN_DATABASE"
+    }
 )
 
 job.commit()
